@@ -74,39 +74,64 @@ public class CategoriasController : ControllerBase
     [HttpPost]
     public ActionResult Post(Categoria categoria)
     {
-        if (categoria is null)
-            return BadRequest("Dados inválidos.");
+        try
+        {
+            if (categoria is null)
+                return BadRequest("Dados inválidos.");
 
-        _context.Add(categoria);
-        _context.SaveChanges();
+            _context.Add(categoria);
+            _context.SaveChanges();
+            return new CreatedAtRouteResult("ObterCategoria",
+                new { id = categoria.CategoriaId }, categoria);
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest,
+                "Erro ao tratar a solicitação.");
+        }
 
-        return new CreatedAtRouteResult("ObterCategoria",
-            new { id = categoria.CategoriaId }, categoria);
     }
 
     [HttpPut("{id:int}")]
     public ActionResult Put(int id, Categoria categoria)
     {
-        if (id != categoria.CategoriaId)
-            return NotFound("Categoria não encontrada.");
+        try
+        {
+            if (id != categoria.CategoriaId)
+                return NotFound("Categoria não encontrada.");
 
-        _context.Entry(categoria).State = EntityState.Modified;
-        _context.SaveChanges();
+            _context.Entry(categoria).State = EntityState.Modified;
+            _context.SaveChanges();
 
-        return Ok(categoria);
+            return Ok(categoria);
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest,
+                "Erro ao tratar a solicitação.");
+        }
     }
 
     [HttpDelete]
     public ActionResult Delete(int id)
     {
-        var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
+        try
+        {
+            var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
 
-        if (categoria is null)
-            return NotFound("Categoria não encontrada.");
+            if (categoria is null)
+                return NotFound("Categoria não encontrada.");
 
-        _context.Categorias.Remove(categoria);
-        _context.SaveChanges();
+            _context.Categorias.Remove(categoria);
+            _context.SaveChanges();
 
-        return Ok(categoria);
+            return Ok(categoria);
+
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest,
+                "Erro ao tratar a solicitação.");
+        }
     }
 }

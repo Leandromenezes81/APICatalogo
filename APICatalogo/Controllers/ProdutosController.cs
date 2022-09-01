@@ -20,70 +20,110 @@ public class ProdutosController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<Produto>> Get()
     {
-        var produtos = _context.Produtos
-                .Take(10)
-                .AsNoTracking()
-                .ToList();
+        try
+        {
+            var produtos = _context.Produtos
+                    .Take(10)
+                    .AsNoTracking()
+                    .ToList();
 
-        if (produtos is null)
-            return NotFound("Produtos não encontrados.");
+            if (produtos is null)
+                return NotFound("Produtos não encontrados.");
 
-        return produtos;
+            return produtos;
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                "Erro ao tratar a solicitação.");
+        }
     }
 
     // Get by id
     [HttpGet("{id:int}", Name = "ObterProduto")]
     public ActionResult<Produto> Get(int id)
     {
-        var produto = _context.Produtos
-                .AsNoTracking()
-                .FirstOrDefault(p => p.ProdutoId == id);
-        
-        if (produto is null)
-            return NotFound("Produto não encontrado.");
+        try
+        {
+            var produto = _context.Produtos
+                    .AsNoTracking()
+                    .FirstOrDefault(p => p.ProdutoId == id);
 
-        return produto;
+            if (produto is null)
+                return NotFound("Produto não encontrado.");
+
+            return produto;
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                "Erro ao tratar a solicitação.");
+        }
     }
 
     // Create new produto
     [HttpPost]
     public ActionResult Post(Produto produto)
     {
-        if (produto is null)
-            return BadRequest("Dados inválidos.");
+        try
+        {
+            if (produto is null)
+                return BadRequest("Dados inválidos.");
 
-        _context.Produtos.Add(produto);
-        _context.SaveChanges();
+            _context.Produtos.Add(produto);
+            _context.SaveChanges();
 
-        return new CreatedAtRouteResult("ObterProduto",
-            new { id = produto.ProdutoId }, produto);
+            return new CreatedAtRouteResult("ObterProduto",
+                new { id = produto.ProdutoId }, produto);
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest,
+                "Erro ao tratar a solicitação.");
+        }
     }
 
     // Update produto
     [HttpPut]
     public ActionResult Put(int id, Produto produto)
     {
-        if (id != produto.ProdutoId)
-            return BadRequest("Id inválido.");
+        try
+        {
+            if (id != produto.ProdutoId)
+                return BadRequest("Id inválido.");
 
-        _context.Entry(produto).State = EntityState.Modified;
-        _context.SaveChanges();
+            _context.Entry(produto).State = EntityState.Modified;
+            _context.SaveChanges();
 
-        return Ok(produto);
+            return Ok(produto);
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest,
+                "Erro ao tratar a solicitação.");
+        }
     }
 
     // Delete produto by id
     [HttpDelete]
     public ActionResult Delete(int id)
     {
-        var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
+        try
+        {
+            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
 
-        if (produto is null)
-            return NotFound("Produto não localizado.");
+            if (produto is null)
+                return NotFound("Produto não localizado.");
 
-        _context.Produtos.Remove(produto);
-        _context.SaveChanges();
+            _context.Produtos.Remove(produto);
+            _context.SaveChanges();
 
-        return Ok(produto);
+            return Ok(produto);
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest,
+                "Erro ao tratar a solicitação.");
+        }
     }
 }
